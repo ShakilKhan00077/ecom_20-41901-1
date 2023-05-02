@@ -2,7 +2,10 @@ package ecom.controller;
 
 import ecom.domain.Customer;
 import ecom.domain.User;
+import ecom.dto.OrderDto;
 import ecom.service.CustomerService;
+import ecom.service.OrderService;
+import ecom.service.ProductService;
 import ecom.service.UserService;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
@@ -22,9 +25,13 @@ import java.sql.SQLException;
 public class CustomerController {
 
     private CustomerService customerService;
+    private final OrderService orderService;
+    private final ProductService productService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, OrderService orderService, ProductService productService) {
         this.customerService = customerService;
+        this.orderService = orderService;
+        this.productService = productService;
     }
 
     @InitBinder
@@ -73,5 +80,22 @@ public class CustomerController {
     public String delete(@RequestParam("customerId") Long customerId) {
         customerService.delete(customerId);
         return "redirect:/customers/list";
+    }
+
+    @RequestMapping("/order_create")
+    public String createOrder(Model model) {
+        model.addAttribute("orderDto", new OrderDto());
+        model.addAttribute("products", productService.list());
+        model.addAttribute("customers", customerService.list());
+        return "orderbycus/create";
+    }
+
+    @RequestMapping("/store_order")
+    public String store(@Valid @ModelAttribute("orderDto") OrderDto orderDto, BindingResult bindingResult) throws SQLException {
+        if (bindingResult.hasErrors()) {
+            return "orderbycus/create";
+        }
+        orderService.createOrder(orderDto);
+        return "redirect:/users/list";
     }
 }

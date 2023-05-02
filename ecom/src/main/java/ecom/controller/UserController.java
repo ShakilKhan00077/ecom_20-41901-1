@@ -1,12 +1,9 @@
 package ecom.controller;
 
-import ecom.domain.Product;
 import ecom.domain.User;
+import ecom.dto.OrderDto;
 import ecom.dto.UserDto;
-import ecom.service.AddressService;
-import ecom.service.CustomerService;
-import ecom.service.ProductService;
-import ecom.service.UserService;
+import ecom.service.*;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +26,15 @@ public class UserController {
 
     private UserService userService;
     private final AddressService addressService;
+    private final OrderService orderService;
 
     private final CustomerService customerService;
     private final ProductService productService;
 
-    public UserController(UserService userService, AddressService addressService, CustomerService customerService, ProductService productService) {
+    public UserController(UserService userService, AddressService addressService, OrderService orderService, CustomerService customerService, ProductService productService) {
         this.userService = userService;
         this.addressService = addressService;
+        this.orderService = orderService;
         this.customerService = customerService;
         this.productService = productService;
     }
@@ -48,8 +47,7 @@ public class UserController {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         webDataBinder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
             @Override
-            public void setAsText(String text) throws IllegalArgumentException
-            {
+            public void setAsText(String text) throws IllegalArgumentException {
                 LocalDate localDate = LocalDate.parse(text, dateFormatter);
                 setValue(localDate);
             }
@@ -115,18 +113,5 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-    @RequestMapping("/order_create")
-    public String createOrder(Model model) {
-        model.addAttribute("products", productService.list());
-        model.addAttribute("customers", customerService.list());
-        return "user/order/create";
-    }
-    @RequestMapping("/store_order")
-    public String store(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult) throws SQLException {
-        if (bindingResult.hasErrors()) {
-            return "user/order/create";
-        }
-        productService.create(product);
-        return "redirect:/user/list";
-    }
+
 }

@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.TypedQuery;
-import java.sql.*;
 import java.util.List;
 
 @Repository
@@ -20,7 +19,7 @@ public class UserRepository {
     public List<User> list() {
         Session session = sessionFactory.getCurrentSession();
         TypedQuery<User> query = session.createQuery(
-                "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.customer.addresses", User.class);
+                "SELECT u FROM User u JOIN FETCH u.customer c JOIN FETCH c.addresses a ", User.class);
         return query.getResultList();
     }
 

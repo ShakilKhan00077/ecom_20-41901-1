@@ -11,6 +11,7 @@
 
 <input type="button" value="Add User" onclick="window.location.href='create';return false;">
 <input type="button" value="Add User DTO" onclick="window.location.href='create_dto';return false;">
+<input type="button" value="Create order" onclick="window.location.href='${pageContext.request.contextPath}/customers/order_create';return false;">
 
 <table>
     <thead>
